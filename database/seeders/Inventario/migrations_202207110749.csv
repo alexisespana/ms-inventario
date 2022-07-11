@@ -1,0 +1,12 @@
+"id","migration","batch"
+1,"2022_05_04_130107_catergorias",1
+2,"2022_05_04_145807_unidad_medida",1
+3,"2022_05_04_145808_productos",1
+4,"2022_05_04_145809_precios",1
+5,"2022_05_04_150311_detalle_prod",1
+6,"2022_05_04_150332_stock",1
+7,"2022_05_04_150354_ventas",1
+8,"2022_05_04_150416_ventas_prod",1
+9,"2022_06_11_172238_create_precio_compras_table",1
+10,"2022_06_22_155606_create_proveedores_table",1
+11,"2022_06_22_160138_create_precios_provs_table",1
