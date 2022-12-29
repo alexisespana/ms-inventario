@@ -9,6 +9,7 @@ use App\Models\Precios\Precios;
 use App\Models\Productos\Productos;
 use App\Models\Stock\Stock;
 use App\Models\UnidadMedida\UnidadMedida;
+use App\Models\Ventas\Ventas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -26,7 +27,18 @@ class ProductosController extends Controller
 
     public function listaProductos(Request $request)
     {
-        // return ($request);
+
+     /*  $ventas= Ventas::where('created_at','!=', null)->take(2)->get();
+       
+       foreach ($ventas as $key => $value) {
+
+        return Carbon::$value->created_at;
+        $Precios = Ventas::where('id', $value->id)->update([
+            'fecha' => $value->created_at
+          
+        ]);
+       }
+         return ($ventas);*/
         $productos = Productos::with(['Stock.precio_compra', 'precio', 'categoria', 'unidad_medida'])->when($request, function ($query) use ($request) {
             if (isset($request['codigo'])){
                  $query->where('codigo', $request['codigo']);

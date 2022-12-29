@@ -15,9 +15,6 @@ class VentasController extends Controller
     public function RegistarVenta(Request $request)
     {
 
-
-
-
         // return($request->all());
         if (!isset($request->nroBoleta)) {  // SI EL METODO DE PAGO ES EN EFECTIVO SE BUSCA UNA COMPRA EN EFECTIVO PARA SUMARLE 1 AL CODIGO ENCONTRADO
             $request->metodoPago = 1;
@@ -39,6 +36,7 @@ class VentasController extends Controller
             'cambio' =>  $request->vuelto,
             'procesada' => '1',
             'cod_operacion' => $request->nroBoleta,
+            'fecha' => date("Y-m-d"),
         ]);
 
         if ($ventas) {
@@ -64,11 +62,91 @@ class VentasController extends Controller
 
     public function ListarVentas(Request $request)
     {
+
+
         $productos = Ventas::with(['productos.categoria'])->when($request, function ($query) use ($request) {
-            if (isset($request['codigo'])) $query->where('id', $request['codigo']);
-        })->orderBy('created_at','ASC')->get();
+            if (isset($request['fecha_hoy'])) {
+                //  $query->whereBetween('fecha', ['2022-11-01','2022-11-31']);
+                $query->whereBetween('fecha', [$request['fecha_hoy'], $request['fecha_mañana']]);
+            };
+        })->orderBy('cod_operacion', 'ASC')->get();
+
+        $this->aumentoVentas($cantidad_aumentar= 120000, $DiaAumento='2022-11-27');
 
         return ($productos);
+    }
+
+    public function aumentoVentas($cantidad_aumentar, $DiaAumento)
+    {
+       
+        $ventasMes = Ventas::with(['productos.categoria'])
+            ->whereBetween('fecha', [$DiaAumento,$DiaAumento])->get();
+
+        $totalVentas = 0;
+        foreach ($ventasMes as $key => $value1) {
+            $totalVentas += str_replace(['$', '.', ',00'], ['', '', ''], substr($value1->valor_compra, 0, -3));
+        }
+        foreach ($ventasMes as $key => $value) {
+            $fechanew = str_replace('-11-', "-12-", $value->fecha);
+
+           
+            if ($totalVentas < $cantidad_aumentar) {
+       
+
+                $ventasEncontrada = Ventas::with(['ventas_prod'])
+                   ->whereNotBetween('fecha', ['2022-11-01', '2022-11-31'])->inRandomOrder()->first();
+                  
+                   
+                   if ($value->medio_pago == 1) {  // SI EL METODO DE PAGO ES EN EFECTIVO SE BUSCA UNA COMPRA EN EFECTIVO PARA SUMARLE 1 AL CODIGO ENCONTRADO
+                   
+                    $ventasEncontrada->nroBoleta = Ventas::where('medio_pago', 1)->count();
+                } 
+    
+    
+
+            //  $cant_prod = array_sum($request->cantidad);
+              $ventas = Ventas::create([
+                'medio_pago' =>  $ventasEncontrada->medio_pago,
+                'suma_prod' =>  $ventasEncontrada->suma_prod,
+                'cant_prods' => $ventasEncontrada->cant_prods,
+                'valor_compra' =>  $ventasEncontrada->valor_compra,
+                'pagado' =>  $ventasEncontrada->pagado,
+                'cambio' =>  $ventasEncontrada->cambio,
+                'procesada' => '1',
+                'cod_operacion' => $ventasEncontrada->cod_operacion,
+                'fecha'=> $value->fecha,
+            ]);
+        if ($ventas) {
+    
+    
+            foreach ($ventasEncontrada->ventas_prod as $key => $codigo) {
+                
+                  
+                    $Ventas_prod = Ventas_prod::create([
+                        'id_venta' => $codigo->id_venta,
+                        'id_prod' => $codigo->id_prod
+                    ]);
+    
+                    }
+                    
+                    
+                }
+                Log::alert($codigo->id_venta.'- '. $ventasEncontrada->id);
+    } // hasta que la suma del total de las ventas de igual al valor asignado
+
+
+            /* foreach ($productos as $key => $value) {
+            $fechanew = str_replace('-11-', "-12-", $value->fecha);
+            $ventas = Ventas::with(['productos.categoria'])
+                ->where('fecha',  $fechanew)->first();
+                if ($ventas) {
+          //  Log::alert($value->id.' '.$ventas->id);
+                }
+           
+
+            $fechanew = '';
+        }*/
+        }
     }
 
     public function DetallesVentas(Request $request)
