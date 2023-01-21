@@ -10,7 +10,7 @@ class Ventas_prod extends Model
 {
     protected $table = 'ventas_prod';
     public $timestamps = false;
-    protected $fillable = ['id_venta', 'id_prod','cantidad'];
+    protected $fillable = ['id_venta', 'id_prod'];
 
     public function ventas()
     {

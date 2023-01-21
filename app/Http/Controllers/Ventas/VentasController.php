@@ -71,7 +71,10 @@ class VentasController extends Controller
             };
         })->orderBy('cod_operacion', 'ASC')->get();
 
-        $this->aumentoVentas($cantidad_aumentar= 120000, $DiaAumento='2022-11-27');
+        Log::alert($request['fecha_hoy']. $request['fecha_mañana']);
+
+        //
+       // $this->aumentoVentas($cantidad_aumentar= 100000, $DiaAumento='2023-01-04');
 
         return ($productos);
     }
@@ -89,7 +92,9 @@ class VentasController extends Controller
         foreach ($ventasMes as $key => $value) {
             $fechanew = str_replace('-11-', "-12-", $value->fecha);
 
-           
+           $ventasEncontrada = Ventas::with(['ventas_prod'])
+                   ->whereNotBetween('fecha', ['2022-11-01', '2022-11-31'])->inRandomOrder()->first();
+                  
             if ($totalVentas < $cantidad_aumentar) {
        
 
@@ -116,7 +121,7 @@ class VentasController extends Controller
                 'cod_operacion' => $ventasEncontrada->cod_operacion,
                 'fecha'=> $value->fecha,
             ]);
-        if ($ventas) {
+       
     
     
             foreach ($ventasEncontrada->ventas_prod as $key => $codigo) {
@@ -130,7 +135,7 @@ class VentasController extends Controller
                     }
                     
                     
-                }
+                
                 Log::alert($codigo->id_venta.'- '. $ventasEncontrada->id);
     } // hasta que la suma del total de las ventas de igual al valor asignado
 
