@@ -21,6 +21,7 @@ $router->group(['prefix' => 'Productos'], function () use ($router) {
     $router->post('/registrar', 'Productos\ProductosController@Registrar');
     $router->post('/editar', 'Productos\ProductosController@Editar');
     $router->post('/ingresarProductos', 'Productos\ProductosController@IngresarProductos');
+    $router->post('/productosVencidos', 'Productos\productosVencidosController@productosVencidos');
 });
 
 $router->group(['prefix' => 'Ventas'], function () use ($router) {
