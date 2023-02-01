@@ -137,8 +137,8 @@ class ProductosController extends Controller
             $stock = Stock::where('id_prod', $productos->id)->update([
                 'id_prod' => $productos["id"],
                 'cantidad' => $request['cantidad'],
-                'fecha_ingreso' => date('d/m/Y'),
-                'fecha_venc' => date('d/m/Y')
+                'fecha_ingreso' => $request["fecha_ingreso"],
+                'fecha_venc' => $request["fecha_venc"]
 
             ]);
 
